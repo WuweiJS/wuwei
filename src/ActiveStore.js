@@ -84,7 +84,7 @@ class ActiveStore {
 
   // Interface
   onParentsUpdate( /* Parent store */ ) {
-    // this.setStore({}) use setStore to change this store value.
+    // this.setValue({}) use setValue to change this store value.
   }
 }
 

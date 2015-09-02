@@ -126,7 +126,7 @@ export default class Counter extends ActiveStore {
   }
 
   onParentsUpdate( /* Parent store */ ) {
-    // this.setValue({}) use setStore to change this store value.
+    // this.setValue({}) use setValue to change this store value.
   }
 }
 ```
