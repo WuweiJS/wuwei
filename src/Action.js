@@ -1,6 +1,6 @@
 import { Graph } from './Wuwei'
 
-export default class ActiveAction {
+export default class Action {
   constructor() {
     //
   }

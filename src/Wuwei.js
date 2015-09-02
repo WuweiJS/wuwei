@@ -1,6 +1,6 @@
 import { Graph, alg } from 'graphlib'
 import ActiveStore from './ActiveStore'
-import ActiveAction from './ActiveAction'
+import Action from './Action'
 
 var G = new Graph({ directed: true });
 var storeGraphTable = {};
@@ -50,7 +50,7 @@ var initializeWuwei = function(fn) {
   initAllStoreNode();
 
 /**
- * In current state, will not find cycle in Store Graph
+ * In current state, cycle will be not exist in the Store Graph
  * if (alg.findCycles(G).length > 0) { throw 'Found cycle in Store Graph' }
  */
 
@@ -67,7 +67,7 @@ export default {
     setAction: setAction,
     getAction: getAction
   },
-  ActiveAction: ActiveAction,
+  Action: Action,
   ActiveStore: ActiveStore,
   init: initializeWuwei
 };

@@ -1,6 +1,6 @@
-import { ActiveAction, Graph } from '../../../src/Wuwei'
+import { Action, Graph } from '../../../src/Wuwei'
 
-export default class Minus extends ActiveAction {
+export default class Minus extends Action {
   onFire() {
     Graph.getStore('counter').minusOne();
   }

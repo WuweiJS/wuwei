@@ -1,4 +1,4 @@
-export default class Action extends ActiveAction {
+export default class Action extends Action {
   // Interface
   onFire(params) {
     // Override by user.

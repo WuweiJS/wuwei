@@ -1,8 +1,6 @@
 Wuwei
 =====================
 
-另一個 Javascript Data-Driven Reactive Framwork
-
 >無為，以時勢、趨勢的判斷做出順勢而為的行為，即順應自然的變化規律，從而達到「無為而無不為」的境界
 
 ## ActiveStore (ViewModel)
@@ -19,7 +17,7 @@ Wuwei
 
 就可以在此時重新建構這個 Store，並檢查本身有無變化（Update）
 
-如果有，就通知 使用到本身的 View，和參照到本身的其他 Store
+如果有，就通知使用到本身的 View，和參照到本身的其他 Store
 
 ### Stores as Graph
 
@@ -27,17 +25,17 @@ Wuwei
 
 <img src="http://web.cecs.pdx.edu/~sheard/course/Cs163/Graphics/graph7.png">
 
-再者，如果決定了，一開始決定了 Graph 的內容，就可以很簡單的在 Server Side Render
+(再者，如果一開始就決定了 Store Graph 的內容，就可以很簡單的在 Server Side Render 了吧？)
 
 ### Map & List
 
 大部份的資料型態屬於這兩種，因此首先會以這兩種資料型態去實作
 
-## ActiveAction
+## Action
 
 >無為而治
 
-當使用者行為發生時，在 Action 裡面只要單純更新 Store 的內容就可以了，剩下的事就交給他們
+當使用者行為發生時，在 Action 裡面只要單純更新 Store 的內容就可以了，剩下的事就交給 Store 他們
 
 ### Transaction Block to Update
 
@@ -53,14 +51,14 @@ Wuwei
 
 ### App.js
 ```js
-import React, { Component } from 'react';
-import Wuwei, { Graph, Gun }     from '../../src/Wuwei'
+import React, { Component }  from 'react';
+import Wuwei, { Graph, Gun } from '../../src/Wuwei'
 
 import Counter          from './stores/Counter'
 import Score            from './stores/Score'
 import ScoreWithCounter from './stores/ScoreWithCounter'
-import Plus    from './actions/Plus'
-import Minus   from './actions/Minus'
+import Plus             from './actions/Plus'
+import Minus            from './actions/Minus'
 
 // Define wuwei.
 Wuwei.init(() => {
@@ -168,9 +166,9 @@ export default class ScoreWithCounter extends ActiveStore {
 ```
 ### Plus.js
 ```js
-import { ActiveAction, Graph } from '../../lib/Wuwei'
+import { Action, Graph } from '../../lib/Wuwei'
 
-export default class Plus extends ActiveAction {
+export default class Plus extends Action {
   onFire() {
     Graph.getStore('counter').plusOne();
   }
@@ -179,9 +177,9 @@ export default class Plus extends ActiveAction {
 ```
 ### Minus.js
 ```js
-import { ActiveAction, Graph } from '../../lib/Wuwei'
+import { Action, Graph } from '../../lib/Wuwei'
 
-export default class Minus extends ActiveAction {
+export default class Minus extends Action {
   onFire() {
     Graph.getStore('counter').minusOne();
   }
