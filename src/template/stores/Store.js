@@ -1,5 +1,3 @@
-import { ActiveStore } from '../../lib/Wuwei'
-
 export default class Store extends ActiveStore {
   constructor() {
     super(...arguments)

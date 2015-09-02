@@ -1,4 +1,4 @@
-import { Graph } from '../lib/Wuwei'
+import { Graph } from './Wuwei'
 
 export default class ActiveAction {
   constructor() {
@@ -13,10 +13,10 @@ export default class ActiveAction {
   onFire(params) {
     // Override by user.
 
-    /*
-    transaction((Graph) => {
-      // Synchronous use Graph in this block only.
-    })
-    */
+  /**
+   * transaction((Graph) => {
+   *   // Synchronous use Graph in this block only.
+   * })
+   */
   }
 }

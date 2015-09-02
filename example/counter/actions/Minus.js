@@ -1,8 +1,7 @@
-import { ActiveAction, Graph } from '../../lib/Wuwei'
+import { ActiveAction, Graph } from '../../../src/Wuwei'
 
 export default class Minus extends ActiveAction {
   onFire() {
-    console.log('ok');
     Graph.getStore('counter').minusOne();
   }
 }

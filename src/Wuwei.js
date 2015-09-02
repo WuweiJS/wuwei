@@ -49,7 +49,11 @@ var initializeWuwei = function(fn) {
 
   initAllStoreNode();
 
-  if (alg.findCycles(G).length > 0) { throw 'Found cycle in Store Graph' }
+/**
+ * In current state, will not find cycle in Store Graph
+ * if (alg.findCycles(G).length > 0) { throw 'Found cycle in Store Graph' }
+ */
+
 };
 
 //

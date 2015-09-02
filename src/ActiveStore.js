@@ -1,15 +1,15 @@
-/*
-ActiveStore Flow
-----------------
-Initialize:     constructor() => setDefaultValue();
-Parents update: resolve() => onParentsUpdate() => setStore() >>> ? [emit('UPDATE'), notifyView()];
-Action fire:    setStore() >>> ? [emit('UPDATE'), notifyView()];
-----------------
-*/
+/**
+ * ActiveStore Flow
+ * ----------------
+ * Initialize:     constructor() -> setDefaultValue();
+ * Parents update: resolve() -> onParentsUpdate() -> setStore() >>> ? [emit('UPDATE'), notifyView()];
+ * Action fire:    setStore() >>> ? [emit('UPDATE'), notifyView()];
+ * ----------------
+ */
 
 import { EventEmitter } from 'events'
 import Immutable from 'immutable';
-import { Graph } from '../lib/Wuwei'
+import { Graph } from './Wuwei'
 
 var PARENT_STORES   = Symbol('PARENT_STORES'),
     IMMUTABLE_STORE = Symbol('IMMUTABLE_STORE'),
@@ -51,7 +51,10 @@ class ActiveStore {
   // Store value
 
   setDefaultValue() {
-    if (this.value) { this[IMMUTABLE_STORE] = Immutable.Map(this.value) }
+    if (this.value) {
+      this[IMMUTABLE_STORE] = Immutable.Map(this.value);
+      this[EVENT_EMITTER].emit('UPDATE', this.getValue());
+    }
   }
 
   setValue(object) {

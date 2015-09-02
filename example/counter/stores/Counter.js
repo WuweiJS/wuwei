@@ -1,4 +1,4 @@
-import { ActiveStore } from '../../lib/Wuwei'
+import { ActiveStore } from '../../../src/Wuwei'
 
 export default class Counter extends ActiveStore {
   constructor() {
@@ -16,6 +16,6 @@ export default class Counter extends ActiveStore {
   }
 
   onParentsUpdate( /* Parent store */ ) {
-    // this.setStore({}) use setStore to change this store value.
+    // this.setValue({}) use setStore to change this store value.
   }
 }

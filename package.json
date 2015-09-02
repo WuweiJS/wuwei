@@ -4,10 +4,10 @@
   "description": "Another Javascript Data-Driven Reactive Framwork For ReactJS",
   "scripts": {
     "start": "node server.js",
-    "lint": "eslint src",
+    "lint": "eslint src"
   },
   "repository": {
-    "type": "git",
+    "type": "git"
   },
   "author": "LeeChSien",
   "license": "MIT",
