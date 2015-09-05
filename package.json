@@ -23,6 +23,7 @@
   "dependencies": {
     "graphlib": "^1.0.7",
     "immutable": "^3.7.4",
-    "react": "^0.13.0"
+    "react": "^0.13.0",
+    "react-router": "^0.13.3"
   }
 }
