@@ -28,8 +28,6 @@ export default class App extends Component {
       town: Graph.getStore('town')
         .subscribe(town => { this.setState({town: town}) })
     };
-
-    console.log(this.state);
   }
 
   selectCounty(event) {
