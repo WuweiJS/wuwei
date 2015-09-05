@@ -35,7 +35,7 @@ class ActiveStore {
       });
     });
 
-    // this.store = set default store value.
+    // this.value = set default store value.
   }
 
   getEventEmitter() {

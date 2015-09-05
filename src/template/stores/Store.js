@@ -6,6 +6,6 @@ export default class Store extends ActiveStore {
   }
 
   onParentsUpdate( /* Parent store */ ) {
-    // this.setStore({}) use setValue to change this store value.
+    // this.setValue({}) use setValue to change this store value.
   }
 }
