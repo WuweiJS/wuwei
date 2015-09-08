@@ -1,3 +1,7 @@
+/**
+ * StoreSet
+ */
+
 import { EventEmitter }    from 'events'
 import   Immutable         from 'immutable'
 

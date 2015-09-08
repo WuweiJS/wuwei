@@ -1,10 +1,10 @@
-import { ActiveStore } from '../../../src/Wuwei'
+import Wuwei from '../../../src/Wuwei'
+
+var { ActiveStore } = Wuwei('postalcodeApp');
 
 export default class DataSource extends ActiveStore {
-  constructor() {
-    super(...arguments)
-
-    this.value = {
+  load() {
+    this.setValue({
       "台北市": {
         "中正區": "100",
         "大同區": "103",
@@ -418,10 +418,10 @@ export default class DataSource extends ActiveStore {
         "富里鄉": "983",
         "卓溪鄉": "982"
       }
-    }
+    });
   }
 
-  onParentsUpdate( /* Parent store */ ) {
+  onSourceUpdate( /* Parent store */ ) {
     // this.setValue({}) use setValue to change this store value.
   }
 }

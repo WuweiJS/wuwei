@@ -1,90 +1,129 @@
 /**
- * ActiveStore Flow
- * ----------------
- * Initialize:     constructor() -> setDefaultValue();
- * Parents update: resolve() -> onParentsUpdate() -> setStore() >>> ? [emit('UPDATE'), notifyView()];
- * Action fire:    setStore() >>> ? [emit('UPDATE'), notifyView()];
- * ----------------
+ * ActiveStore
  */
 
-import { EventEmitter } from 'events'
-import Immutable from 'immutable';
-import { Graph } from './Wuwei'
+import { EventEmitter }    from 'events'
+import   Immutable         from 'immutable';
 
-var PARENT_STORES   = Symbol('PARENT_STORES'),
-    IMMUTABLE_STORE = Symbol('IMMUTABLE_STORE'),
-    EVENT_EMITTER   = Symbol('EVENT_EMITTER');
+var EVENT_EMITTER = Symbol('EVENT_EMITTER'),
+    SOURCES       = Symbol('SOURCES'),
+    VALUE         = Symbol('VALUE'),
+    NAME          = Symbol('NAME'),
+    SET           = Symbol('SET'),
+
+    TEARDOWN      = 'TEARDOWN',
+    UPDATE        = 'UPDATE';
 
 class ActiveStore {
+  constructor($store, name, set = null) {
 
-  // default store()
-
-  constructor() {
     // Private variables
-    this[PARENT_STORES]   = Array.prototype.slice.call(arguments); //Array.from(arguments);
-    this[IMMUTABLE_STORE] = Immutable.Map({});
-    this[EVENT_EMITTER]   = new EventEmitter();
+    this[EVENT_EMITTER] = new EventEmitter();
+    this[VALUE]         = Immutable.Map({});
+    this[NAME]          = name;
+    this[SET]           = set;
 
     // Public variables
-    this.store = null // Default store
+    this.$store         = $store;
+    this.type           = 'ActiveStore';
 
-    // Binding parent stores.
-    this[PARENT_STORES].forEach((parentStore) => {
-      parentStore.getEventEmitter().on('UPDATE', () => {
-        this.resolve();
-      });
-    });
-
-    // this.value = set default store value.
   }
 
   getEventEmitter() {
     return this[EVENT_EMITTER];
   }
 
-  resolve() {
-    if (this.onParentsUpdate != null) {
-      this.onParentsUpdate(...this[PARENT_STORES].map(parentStore => parentStore.getValue()))
-    }
-  }
-
-  // Store value
-
-  setDefaultValue() {
-    if (this.value) {
-      this[IMMUTABLE_STORE] = Immutable.Map(this.value);
-      this[EVENT_EMITTER].emit('UPDATE', this.getValue());
-    }
+  getName() {
+    return this[NAME];
   }
 
   setValue(object) {
-
-    var existStore  = this[IMMUTABLE_STORE],
+    var existStore  = this[VALUE],
         newStore    = Immutable.Map(object),
         mergedStore = existStore.merge(newStore);
 
     if (existStore !== mergedStore) {
-      this[IMMUTABLE_STORE] = mergedStore;
+      this[VALUE] = mergedStore;
 
-      // Trigger UPDATE event for children & Notify subscribed view.
-      this[EVENT_EMITTER].emit('UPDATE', this.getValue());
+      // Trigger UPDATE event to children stores and notify subscribed view.
+      this[EVENT_EMITTER].emit(UPDATE, this.getValue());
     }
+    return this;
   }
 
   getValue() {
-    return this[IMMUTABLE_STORE].toObject();
+    return this[VALUE].toObject();
   }
 
-  // View
+  sourceUpdate() {
+    if (this.onSourceUpdate) {
+      this.onSourceUpdate(...this[SOURCES].map(source => source.getValue()))
+    }
+  }
 
-  subscribe(fn) {
-    this[EVENT_EMITTER].on('UPDATE', fn);
-    return this.getValue();
+  source() {
+    this[SOURCES] =
+      Array.prototype.slice.call(arguments)
+        .map((name) => {
+          return this.$store[name];
+        }); // ES6: Array.from(arguments);
+
+    this[SOURCES].forEach((source) => {
+      source.getEventEmitter()
+        .on(UPDATE, () => {
+          this.sourceUpdate()
+        });
+
+      source.getEventEmitter()
+        .on(TEARDOWN, () => {
+          console.log('teardown');
+          if (this[SET]) {
+            this[SET].delete(this);
+          } else {
+            this.teardown();
+          }
+        });
+    });
+  }
+
+  teardown() {
+    this[EVENT_EMITTER].emit(TEARDOWN);
+    // this[EVENT_EMITTER].removeAllListeners();
+    this.$store[this[NAME]] = null;
   }
 
   // Interface
-  onParentsUpdate( /* Parent store */ ) {
+  onSourceUpdate( /* Source store */ ) {
     // this.setValue({}) use setValue to change this store value.
+  }
+
+  subscribe(_callback) {
+    if (_callback) {
+      this[EVENT_EMITTER].on(UPDATE, _callback);
+      return this.getValue();
+    } else {
+      return {
+        bind: (reactComponent) => {
+          return {
+            state: (stateKey) => {
+              let subscribeCallback = (value) => {
+                if (reactComponent) {
+                  let state = {};
+                  state[stateKey] = value;
+                  reactComponent.setState(state);
+                } else {
+                  this[EVENT_EMITTER].removeListener(UPDATE, subscribeCallback);
+                }
+              }
+
+              this[EVENT_EMITTER].on(UPDATE, subscribeCallback);
+
+              return this.getValue();
+            }
+          }
+        }
+      }
+    }
   }
 }
 
