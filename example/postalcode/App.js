@@ -1,41 +1,44 @@
 import React, { Component } from 'react';
-import Wuwei, { Graph, Gun }     from '../../src/Wuwei'
+import Wuwei from '../../src/Wuwei'
 
 import DataSource      from './stores/DataSource'
 import County          from './stores/County'
 import Town            from './stores/Town'
 
-import SelectCounty    from './actions/SelectCounty'
-import SelectTown      from './actions/SelectTown'
-
-// Define wuwei.
-Wuwei.init(() => {
-  Graph.setStore('dataSource', DataSource, []);
-  Graph.setStore('county', County, ['dataSource']);
-  Graph.setStore('town', Town, ['dataSource', 'county']);
-
-  Gun.setAction('selectCounty', SelectCounty);
-  Gun.setAction('selectTown', SelectTown);
-});
+var { $store, $action } = Wuwei('postalcodeApp');
 
 export default class App extends Component {
   constructor() {
     super();
 
-    this.state = {
-      county: Graph.getStore('county')
-        .subscribe(county => { this.setState({county: county}) }),
-      town: Graph.getStore('town')
-        .subscribe(town => { this.setState({town: town}) })
-    };
+    // Set store & stores's path
+    $store.create('dataSource', DataSource)
+    $store.create('county', County).source('dataSource');
+    $store.create('town', Town).source('dataSource', 'county');
+
+    // load JSON
+    $store.dataSource.load();
+
+    this.state = $store.subscribe({
+        'county': 'county',
+        'town': 'town'
+      }).bind(this);
   }
 
   selectCounty(event) {
-    Gun.getAction('selectCounty').fire(event.target.value);
+    $action.dynamic(() => {
+      $store.county.setValue({
+        selected: event.target.value
+      });
+    });
   }
 
   selectTown(event) {
-    Gun.getAction('selectTown').fire(event.target.value);
+    $action.dynamic(() => {
+      $store.town.setValue({
+        selected: event.target.value
+      });
+    });
   }
 
   render() {

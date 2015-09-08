@@ -1,11 +1,9 @@
-import { ActiveStore } from '../../../src/Wuwei'
+import Wuwei from '../../../src/Wuwei'
+
+var { ActiveStore } = Wuwei('postalcodeApp');
 
 export default class Town extends ActiveStore {
-  constructor() {
-    super(...arguments)
-  }
-
-  onParentsUpdate(dataSource, county) {
+  onSourceUpdate(dataSource, county) {
     let list = [];
 
     if (county.selected) {

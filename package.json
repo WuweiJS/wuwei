@@ -4,7 +4,8 @@
   "description": "Another Javascript Data-Driven Reactive Framwork For ReactJS",
   "scripts": {
     "start": "node server.js",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "play": "babel-node playground/fiddle.js"
   },
   "repository": {
     "type": "git"
@@ -21,6 +22,7 @@
     "webpack-dev-server": "^1.8.2"
   },
   "dependencies": {
+    "collections": "^1.2.4",
     "graphlib": "^1.0.7",
     "immutable": "^3.7.4",
     "react": "^0.13.0",

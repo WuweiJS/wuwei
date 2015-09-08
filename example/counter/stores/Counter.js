@@ -1,12 +1,8 @@
-import { ActiveStore } from '../../../src/Wuwei'
+import Wuwei from '../../../src/Wuwei'
+
+var { ActiveStore } = Wuwei('counterApp');
 
 export default class Counter extends ActiveStore {
-  constructor() {
-    super(...arguments)
-
-    this.value = { value: 10 }
-  }
-
   plusOne(){
     this.setValue({value: this.getValue().value + 1});
   }
@@ -15,7 +11,7 @@ export default class Counter extends ActiveStore {
     this.setValue({value: this.getValue().value - 1});
   }
 
-  onParentsUpdate( /* Parent store */ ) {
+  onSourceUpdate( /* Parent store */ ) {
     // this.setValue({}) use setValue to change this store value.
   }
 }

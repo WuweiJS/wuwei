@@ -1,11 +1,9 @@
-import { ActiveStore } from '../../../src/Wuwei'
+import Wuwei from '../../../src/Wuwei'
+
+var { ActiveStore } = Wuwei('counterApp');
 
 export default class Score extends ActiveStore {
-  constructor() {
-    super(...arguments)
-  }
-
-  onParentsUpdate(counter ) {
+  onSourceUpdate(counter) {
     this.setValue({value: counter.value * 100});
   }
 }
