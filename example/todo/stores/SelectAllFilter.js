@@ -6,19 +6,15 @@ var { ActiveStore } = Wuwei('todoApp');
 
 export default class SelectAllFilter extends ActiveStore {
   setOn() {
-    this.setValue({
-      current: true
-    });
+    this.setValue({ current: true });
   }
 
   setOff() {
-    this.setValue({
-      current: false
-    });
+    this.setValue({ current: false });
   }
 
   setSignal(act) {
-    this.setValue({signal: act});
+    this.setValue({ signal: act });
   }
 
   toggle() {

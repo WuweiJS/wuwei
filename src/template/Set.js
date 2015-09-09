@@ -1,5 +1,12 @@
 export default class Set extends StoreSet {
-  onSourceUpdate( /* source store */ ) {
-    // this.setValue({}) use setValue to change this store value.
+  constructor() {
+    super(...arguments);
+
+    /**
+     * Use setReduceMethod to Calculate value from set when set update.
+     * this.setReduceMethod(() => { });
+     */
+
+    // Intialize set here
   }
 }

@@ -13,15 +13,17 @@ import TodoList        from './stores/TodoList'
 
 var { $store, $action } = Wuwei('todoApp');
 
-$store.create('showingFilter', ShowingFilter);
+(() => {
+  $store.create('showingFilter', ShowingFilter);
 
-$store.showingFilter.bindRoutes();
+  $store.create('selectAllFilter', SelectAllFilter);
 
-$store.create('selectAllFilter', SelectAllFilter);
+  $store.createSet('todoList', TodoList)
+        .itemClass(TodoItem)
+        .itemSource('selectAllFilter')
 
-$store.createSet('todoList', TodoList)
-      .itemClass(TodoItem)
-      .itemSource('selectAllFilter')
+  $store.showingFilter.bindRoutes();
+})();
 
 export default class App extends Component {
   constructor() {

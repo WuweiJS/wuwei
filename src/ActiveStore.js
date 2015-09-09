@@ -1,58 +1,25 @@
 /**
  * ActiveStore
  */
+import StoreBase from './StoreBase'
+import { UPDATE, TEARDOWN } from './Events'
 
-import { EventEmitter }    from 'events'
-import   Immutable         from 'immutable';
+var REG_LISTENERS = Symbol('REG_LISTENERS'),
+    SOURCES = Symbol('SOURCES'),
+    SET = Symbol('SET');
 
-var EVENT_EMITTER = Symbol('EVENT_EMITTER'),
-    SOURCES       = Symbol('SOURCES'),
-    VALUE         = Symbol('VALUE'),
-    NAME          = Symbol('NAME'),
-    SET           = Symbol('SET'),
-
-    TEARDOWN      = 'TEARDOWN',
-    UPDATE        = 'UPDATE';
-
-class ActiveStore {
+class ActiveStore extends StoreBase {
   constructor($store, name, set = null) {
+    super(name);
 
     // Private variables
-    this[EVENT_EMITTER] = new EventEmitter();
-    this[VALUE]         = Immutable.Map({});
-    this[NAME]          = name;
-    this[SET]           = set;
+    this[REG_LISTENERS] = {};
+    this[SOURCES] = [];
+    this[SET] = set;
 
     // Public variables
-    this.$store         = $store;
-    this.type           = 'ActiveStore';
-
-  }
-
-  getEventEmitter() {
-    return this[EVENT_EMITTER];
-  }
-
-  getName() {
-    return this[NAME];
-  }
-
-  setValue(object) {
-    var existStore  = this[VALUE],
-        newStore    = Immutable.Map(object),
-        mergedStore = existStore.merge(newStore);
-
-    if (existStore !== mergedStore) {
-      this[VALUE] = mergedStore;
-
-      // Trigger UPDATE event to children stores and notify subscribed view.
-      this[EVENT_EMITTER].emit(UPDATE, this.getValue());
-    }
-    return this;
-  }
-
-  getValue() {
-    return this[VALUE].toObject();
+    this.$store = $store;
+    this.type = 'ActiveStore';
   }
 
   sourceUpdate() {
@@ -61,69 +28,46 @@ class ActiveStore {
     }
   }
 
+  sourceTeardown() {
+    if (this[SET]) {
+      this[SET].delete(this);
+    } else {
+      this.teardown();
+    }
+  }
+
   source() {
     this[SOURCES] =
       Array.prototype.slice.call(arguments)
-        .map((name) => {
-          return this.$store[name];
-        }); // ES6: Array.from(arguments);
+        .map((name) => { return this.$store[name]; }); // ES6: Array.from(arguments);
+
+    this[REG_LISTENERS][UPDATE] = this.sourceUpdate.bind(this);
+    this[REG_LISTENERS][TEARDOWN] = this.sourceTeardown.bind(this);
 
     this[SOURCES].forEach((source) => {
       source.getEventEmitter()
-        .on(UPDATE, () => {
-          this.sourceUpdate()
-        });
-
+        .on(UPDATE, this[REG_LISTENERS][UPDATE]);
       source.getEventEmitter()
-        .on(TEARDOWN, () => {
-          console.log('teardown');
-          if (this[SET]) {
-            this[SET].delete(this);
-          } else {
-            this.teardown();
-          }
-        });
+        .on(TEARDOWN, this[REG_LISTENERS][TEARDOWN]);
     });
   }
 
   teardown() {
-    this[EVENT_EMITTER].emit(TEARDOWN);
-    // this[EVENT_EMITTER].removeAllListeners();
-    this.$store[this[NAME]] = null;
+    this.getEventEmitter().emit(TEARDOWN);
+
+    this[SOURCES].forEach((source) => {
+      source.getEventEmitter()
+        .removeListener(UPDATE, this[REG_LISTENERS][UPDATE]);
+      source.getEventEmitter()
+        .removeListener(TEARDOWN, this[REG_LISTENERS][TEARDOWN]);
+    });
+
+    this.$store[this.getName()] = null;
   }
 
-  // Interface
-  onSourceUpdate( /* Source store */ ) {
+  // User Interface
+  onSourceUpdate( /* Source stores */ ) {
     // this.setValue({}) use setValue to change this store value.
-  }
-
-  subscribe(_callback) {
-    if (_callback) {
-      this[EVENT_EMITTER].on(UPDATE, _callback);
-      return this.getValue();
-    } else {
-      return {
-        bind: (reactComponent) => {
-          return {
-            state: (stateKey) => {
-              let subscribeCallback = (value) => {
-                if (reactComponent) {
-                  let state = {};
-                  state[stateKey] = value;
-                  reactComponent.setState(state);
-                } else {
-                  this[EVENT_EMITTER].removeListener(UPDATE, subscribeCallback);
-                }
-              }
-
-              this[EVENT_EMITTER].on(UPDATE, subscribeCallback);
-
-              return this.getValue();
-            }
-          }
-        }
-      }
-    }
   }
 }
 

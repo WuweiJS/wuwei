@@ -2,6 +2,8 @@
  * StoreMultiSet
  */
 
+// TODO: Wait for refactor & redesign
+
 import { EventEmitter }    from 'events'
 import   Immutable         from 'immutable'
 

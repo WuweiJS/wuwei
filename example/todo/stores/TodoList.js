@@ -7,12 +7,12 @@ export default class TodoList extends StoreSet {
     super(...arguments);
 
     // Total size
-    this.setReduceCallback(() => {
+    this.setReduceMethod(() => {
       this.setValue({itemSize: this.size()});
     });
 
     // Completed Size
-    this.setReduceCallback(() => {
+    this.setReduceMethod(() => {
       let completedSize = 0, activeSize = 0;
 
       this.toArray().forEach((item) => {
