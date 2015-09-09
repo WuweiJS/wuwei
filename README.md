@@ -1,122 +1,215 @@
 Wuwei
 =====================
 
->無為，以時勢、趨勢的判斷做出順勢而為的行為，即順應自然的變化規律，從而達到「無為而無不為」的境界
-
-## ActiveStore (ViewModel)
-
->君君，臣臣，父父，子子
+Wuwei is a Data-Driven Reactive Framework.
 
 <img src="http://deltastreammedia.com/mn-epub-images/ch-newfunctions1.jpg" width="300">
 
-在 Wuwei 的設計裡，每個 Store 以『資料流』的概念設計。
+# Usage
 
-一個 Store 本身，可以參照外部的 Store，作為建構這個 Store 的來源
+## $store, $action
 
-當外部的 Store 發生變化時，會收到通知
+You need $store and $action to use Wuwei.
 
-就可以在此時重新建構這個 Store，並檢查本身有無變化（Update）
+### Access $store & $action
+```js
+import Wuwei from 'wuwei'
 
-如果有，就通知使用到本身的 View，和參照到本身的其他 Store
+var { $store, $action } = Wuwei( namespace );
 
-### Stores as Graph
+// @params namespace: The namespace for your App.
+```
+Wuwei provide namespace to seperate different App's store space.
 
-依照我們的方法去構築，最後所有的 Store 就會形成一個不存在 Cycle 的有向圖（Directed-Graph）
+## ActiveStore
+>君君，臣臣，父父，子子
+
+### Principle
+
+1. Every store as instance of Store Class which extends from ActiveStore.
+
+2. Stores maybe have other source store to construct themself.
+
+3. You can define logic in Store Class.
 
 <img src="http://web.cecs.pdx.edu/~sheard/course/Cs163/Graphics/graph7.png">
 
-(再者，如果一開始就決定了 Store Graph 的內容，就可以很簡單的在 Server Side Render 了吧？)
+### Example of Store Class
 
-### Map & List
+```js
+import Wuwei from 'wuwei'
 
-大部份的資料型態屬於這兩種，因此首先會以這兩種資料型態去實作
+var { ActiveStore } = Wuwei('counterApp');
 
-## Action
+export default class Score extends ActiveStore {
+  onSourceUpdate(counter) {
+    this.setValue({value: counter.value * 100});
+  }
+}
+```
 
->無為而治
+In this case, Score has source store "counter", when counter's value changed, will trigger "onSourceUpdate" to update Score itself.
 
-當使用者行為發生時，在 Action 裡面只要單純更新 Store 的內容就可以了，剩下的事就交給 Store 他們
+### onSourceUpdate( ...storeValues )
 
-### Transaction Block to Update
+ActiveStore provide method "onSourceUpdate", you can override it to implement how to update this store when source store changed.
 
->這是一個理想上改善效能的方法，但尚未實作
+### Create a Store
 
-當同一個 Action 更新多個 Store 內容時，可能會造成子節點，有被重複通知更新的情形
+```js
+$store.create(store_name, StoreClass);
 
-此時透過 Transaction Block 將資料先更新好，逐層去檢查須更新的節點
+/*
+@params store_name: Name of this store.
+@params store_name: Object Class of this store. (extends from ActiveStore)
+*/
+```
 
-## Example
+```js
+// Example
+$store.create('score', Score);
+```
 
-這是一個理想上的 Counter 範例
+### Access a Store
+
+```js
+// Example
+$store.score
+```
+
+### ActiveStore Public Method
+
+#### source( ...storeNames )
+
+Define source stores of this store.
+
+```js
+// Example
+$store.foo.source('bar1', 'bar2');
+// or
+$store.create('score', Score).source('counter');
+```
+
+#### getName()
+
+Access the name of this store.
+
+```js
+// Example
+$store.score.getName()
+```
+
+#### setValue( { key: value } )
+
+Assign value to this store, store will check whether changed with immutable object comparison.
+
+```js
+// Example
+$store.score.setValue({value: 100});
+```
+
+#### getValue()
+
+Access the value of this store.
+```js
+// Example
+$store.score.getValue();
+// => {value: 100}
+```
+
+#### subscribe( callback( newValue ) )
+
+You subscribe a store, when the store's value changed will trigger callback you assigned.
+
+```js
+// Example
+$store.foo.subscribe((foo) => {
+  // do something...
+});
+```
+
+#### subscribe with ReactJS
+
+If you use ReactJS, you can subscribe store to react component with follow example.
+
+```js
+// Example
+this.state = {
+  stateKey: $store.foo.subscribe().bind(reactComponent).state('stateKey');
+}
+// or
+this.state = $store.subscribe({
+  'stateKey1': 'foo',
+  'stateKey2': 'bar'
+}).bind(reactComponent)
+
+```
+## Basic Example
+
+This is a counter app with Wuwei.
 
 ### App.js
 ```js
-import React, { Component }  from 'react';
-import Wuwei, { Graph, Gun } from '../../src/Wuwei'
+import React, { Component } from 'react';
+import Wuwei from '../../src/Wuwei'
 
 import Counter          from './stores/Counter'
 import Score            from './stores/Score'
-import ScoreWithCounter from './stores/ScoreWithCounter'
-import Plus             from './actions/Plus'
-import Minus            from './actions/Minus'
 
-// Define wuwei.
-Wuwei.init(() => {
-  Graph.setStore('counter', Counter, []);
-  Graph.setStore('score', Score, ['counter']);
-  Graph.setStore('score_with_counter', ScoreWithCounter, ['score', 'counter']);
+var { $store, $action } = Wuwei('counterApp');
 
-  Gun.setAction('plus', Plus);
-  Gun.setAction('minus', Minus);
-});
+(() => {
+  // Set store & stores's path
+  $store.create('counter', Counter)
+  $store.create('score', Score).source('counter');
+
+  // set store default value
+  $store.counter.setValue({value: 10});
+})();
 
 export default class App extends Component {
   constructor() {
     super();
 
-    this.state = {
-      counter: Graph.getStore('counter')
-        .subscribe(counter => { this.setState({counter: counter}) }),
-      score: Graph.getStore('score')
-        .subscribe(score => { this.setState({score: score}) }),
-      score_with_counter: Graph.getStore('score_with_counter')
-        .subscribe(score_with_counter => { this.setState({score_with_counter: score_with_counter}) })
-    };
+    this.state = $store.subscribe({
+        'counter': 'counter',
+        'score': 'score'
+      }).bind(this);
   }
 
   plus() {
-    Gun.getAction('plus').fire();
+    $action.dynamic(() => {
+      $store.counter.plusOne();
+    });
   }
 
   minus() {
-    Gun.getAction('minus').fire();
+    $action.dynamic(() => {
+      $store.counter.minusOne();
+    });
   }
 
   render() {
     return (
       <div>
-        <h1>Counter.</h1>
+        <h1>Counter</h1>
         <h2>{this.state.counter.value}</h2>
         <h2>Score: {this.state.score.value}</h2>
-        <h2>{this.state.score_with_counter.value}</h2>
         <button onClick={this.plus} >plus</button>
         <button onClick={this.minus} >minus</button>
       </div>
     );
   }
 }
+
 ```
 ### Counter.js
 ```js
-import { ActiveStore } from '../../../src/Wuwei'
+import Wuwei from '../../../src/Wuwei'
+
+var { ActiveStore } = Wuwei('counterApp');
 
 export default class Counter extends ActiveStore {
-  constructor() {
-    super(...arguments)
-
-    this.value = { value: 10 }
-  }
-
   plusOne(){
     this.setValue({value: this.getValue().value + 1});
   }
@@ -125,59 +218,20 @@ export default class Counter extends ActiveStore {
     this.setValue({value: this.getValue().value - 1});
   }
 
-  onParentsUpdate( /* Parent store */ ) {
+  onSourceUpdate( /* Parent store */ ) {
     // this.setValue({}) use setValue to change this store value.
   }
 }
 ```
 ### Score.js
 ```js
-import { ActiveStore } from '../../../src/Wuwei'
+import Wuwei from '../../../src/Wuwei'
+
+var { ActiveStore } = Wuwei('counterApp');
 
 export default class Score extends ActiveStore {
-  constructor() {
-    super(...arguments)
-  }
-
-  onParentsUpdate(counter ) {
+  onSourceUpdate(counter) {
     this.setValue({value: counter.value * 100});
-  }
-}
-```
-### ScoreWithCounter.js
-```js
-import { ActiveStore } from '../../../src/Wuwei'
-
-export default class ScoreWithCounter extends ActiveStore {
-  constructor() {
-    super(...arguments)
-  }
-
-  onParentsUpdate(score, counter) {
-    this.setValue({
-      value: `Score: ${score.value} / Counter: ${counter.value}`
-    });
-  }
-}
-```
-### Plus.js
-```js
-import { Action, Graph } from '../../lib/Wuwei'
-
-export default class Plus extends Action {
-  onFire() {
-    Graph.getStore('counter').plusOne();
-  }
-}
-
-```
-### Minus.js
-```js
-import { Action, Graph } from '../../lib/Wuwei'
-
-export default class Minus extends Action {
-  onFire() {
-    Graph.getStore('counter').minusOne();
   }
 }
 ```

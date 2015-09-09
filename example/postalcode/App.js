@@ -7,13 +7,15 @@ import Town            from './stores/Town'
 
 var { $store, $action } = Wuwei('postalcodeApp');
 
-// Set store & stores's path
-$store.create('dataSource', DataSource)
-$store.create('county', County).source('dataSource');
-$store.create('town', Town).source('dataSource', 'county');
+(() => {
+  // Set store & stores's path
+  $store.create('dataSource', DataSource)
+  $store.create('county', County).source('dataSource');
+  $store.create('town', Town).source('dataSource', 'county');
 
-// load JSON
-$store.dataSource.load();
+  // load JSON
+  $store.dataSource.load();
+})();
 
 export default class App extends Component {
   constructor() {

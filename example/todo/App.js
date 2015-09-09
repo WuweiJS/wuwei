@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 
 import Header from './Components/Header'
-import List   from './Components/List'
+import List from './Components/List'
 import Footer from './Components/Footer'
 
 import Wuwei from '../../src/Wuwei'
 
-import ShowingFilter   from './stores/ShowingFilter'
+import ShowingFilter from './stores/ShowingFilter'
 import SelectAllFilter from './stores/SelectAllFilter'
-import TodoItem        from './stores/TodoItem'
-import TodoList        from './stores/TodoList'
+import TodoItem from './stores/TodoItem'
+import TodoList from './stores/TodoList'
 
 var { $store, $action } = Wuwei('todoApp');
 
@@ -44,16 +44,14 @@ export default class App extends Component {
     return (
       <section className="todoapp">
         <Header />
-
-  			<section className="main">
-  				<input className="toggle-all" type="checkbox"
+        <section className="main">
+          <input className="toggle-all" type="checkbox"
             onChange={this.handleToggle.bind(this)}
             checked={this.state.selectAllFilter.current} />
-          <List />
-  			</section>
-
+          <List/>
+        </section>
         <Footer />
-  		</section>
+      </section>
     );
   }
 }

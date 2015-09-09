@@ -6,12 +6,14 @@ import Score            from './stores/Score'
 
 var { $store, $action } = Wuwei('counterApp');
 
-// Set store & stores's path
-$store.create('counter', Counter)
-$store.create('score', Score).source('counter');
+(() => {
+  // Set store & stores's path
+  $store.create('counter', Counter)
+  $store.create('score', Score).source('counter');
 
-// set store default value
-$store.counter.setValue({value: 10});
+  // set store default value
+  $store.counter.setValue({value: 10});
+})();
 
 export default class App extends Component {
   constructor() {
