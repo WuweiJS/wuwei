@@ -11,7 +11,7 @@ export default class TodoList extends StoreSet {
       this.setValue({itemSize: this.size()});
     });
 
-    // Completed Size
+    // Active & Completed size
     this.setReduceMethod(() => {
       let completedSize = 0, activeSize = 0;
 
