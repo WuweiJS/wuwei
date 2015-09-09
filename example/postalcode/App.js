@@ -44,7 +44,7 @@ export default class App extends Component {
   render() {
     return (
       <div>
-        <h1>Postcode example</h1>
+        <h1>Postalcode</h1>
 
         <h3>請選擇地區</h3>
         <select onChange={this.selectCounty} value={this.state.county.selected}>
