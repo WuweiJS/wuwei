@@ -38,7 +38,7 @@ export default class App extends Component {
   render() {
     return (
       <div>
-        <h1>Counter.</h1>
+        <h1>Counter</h1>
         <h2>{this.state.counter.value}</h2>
         <h2>Score: {this.state.score.value}</h2>
         <button onClick={this.plus} >plus</button>

@@ -39,9 +39,9 @@ class StoreResource {
     }
   }
 
-  createSet(setName, itemClass) {
+  createSet(setName, setClass) {
     if (this[setName]) { throw `Store node: ${setName} is exist.` }
-    this[setName] = new StoreSet(this, setName, itemClass);
+    this[setName] = new setClass(this, setName);
 
     return this[setName];
   }
