@@ -20,7 +20,7 @@ $store.createSet('foo_list', FooList)
 
 $store.createSet('bar_list', BarList)
   .itemClass(BarList)
-  .itemBelongsTo('foo_list')
+  .itemMapFrom('foo_list')
   .itemSource('bar1', 'bar2', 'bar3')
 
 $store.createMultiSet('bar_list_set', BarList)

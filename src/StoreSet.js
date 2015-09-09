@@ -33,7 +33,7 @@ class StoreSet extends StoreBase {
     return this;
   }
 
-  itemBelongsTo(setName) {
+  itemMapFrom(setName) {
     this[SET_SOURCE] = this.$store[setName];
     this[SET_SOURCE].getEventEmitter()
       .on(ADD_ITEM, (sourceItem) => {

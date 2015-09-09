@@ -13,8 +13,8 @@ export default class Town extends ActiveStore {
     }
 
     this.setValue({
-      selected: null,
       list: list,
+      selected: null,
       codeTable: dataSource[county.selected]
     });
   }
