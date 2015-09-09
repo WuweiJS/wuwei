@@ -51,7 +51,7 @@ export default class App extends Component {
           <List/>
         </section>
         <Footer />
-  		</section>
+      </section>
     );
   }
 }
