@@ -337,6 +337,10 @@ return new item created in this set.
 
 Delete item in this set.
 
+#### toArray()
+
+Trasform set to array.
+
 #### at( index )
 
 Access item with index.
