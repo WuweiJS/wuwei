@@ -26,11 +26,11 @@ Wuwei provide namespace to seperate different App's store space.
 
 ### Principle
 
-1. Every store as instance of Store Class which extends from ActiveStore.
+1. Every store as instance of `Store Class` which extends from ActiveStore.
 
-2. Stores maybe have other source stores to construct themself.
+2. Stores maybe have other source store to construct themself.
 
-3. You can define logic in Store Class.
+3. You can define logic in `Store Class`.
 
 <img src="http://web.cecs.pdx.edu/~sheard/course/Cs163/Graphics/graph7.png">
 
@@ -57,11 +57,11 @@ ActiveStore provide method "onSourceUpdate", you can override it to implement ho
 ### Create a Store
 
 ```js
-$store.create(store_name, StoreClass);
+$store.create(storeName, StoreClass);
 
 /*
-@params store_name: Name of this store.
-@params store_name: Object Class of this store. (extends from ActiveStore)
+@params storeName: Name of this store.
+@params StoreClass: Object Class of this store. (extends from ActiveStore)
 */
 ```
 
@@ -147,6 +147,8 @@ this.state = $store.subscribe({
 ## Basic Example
 
 This is a counter app with Wuwei.
+
+Demo: http://wuweijs.github.io/wuwei/
 
 ### App.js
 ```js
@@ -235,3 +237,122 @@ export default class Score extends ActiveStore {
   }
 }
 ```
+## StoreSet (Abstract Data Type)
+
+Help you manipulate dynamic store collection, such as list.
+
+### Create a Set
+
+```js
+$store.createSet(setName, setClass)
+
+/*
+@params setName: Name of this store.
+@params setClass: Object Class of this set. (extends from StoreSet)
+*/
+```
+
+```js
+// Example
+$store.create('todoList', TodoList);
+```
+
+### Access a Set
+
+```js
+// Example
+$store.todoList
+```
+
+### Assign Store Class for item of set.
+
+```js
+// Example
+$store.createSet('todoList', TodoList)
+      .itemClass(TodoItem)
+```
+
+### Assign source store for each item of set.
+
+```js
+// Example
+$store.createSet('todoList', TodoList)
+      .itemClass(TodoItem)
+      .itemSource('selectAllFilter')
+```
+
+### Principle
+
+1. Set is a collection of stores.
+2. Those stores are same `Store Class`.
+3. Set has its own value, the value can calculate from its items.
+4. Set can map from another set.
+
+### Example of Set
+
+```js
+import Wuwei from 'wuwei'
+
+var { StoreSet } = Wuwei('todoApp');
+
+export default class TodoList extends StoreSet {
+  constructor() {
+    super(...arguments);
+
+    // Total size
+    this.setReduceMethod(() => {
+      this.setValue({itemSize: this.size()});
+    });
+  }
+}
+```
+In this case we can use method "setReduceMethod", assign our customized callback to calculate update TodoList's value "itemSize" when items changed (Add, Delete, or someone update)
+
+### setReduceMethod( callback )
+
+StoreSet provide method "setReduceMethod", you can use it to assign callback to update value which is subscribe with other View component.
+
+### StoreSet Public Method
+
+#### getName()
+#### setValue( { key: value } )
+#### getValue()
+#### subscribe( callback( newValue ) )
+
+The usage is same as ActiveStore.
+
+#### itemClass( storeClass )
+
+Define item's `Store Class` in this set.
+
+#### itemSource( ...storeName )
+
+Assign source store for each item.
+
+#### add()
+
+return new item created in this set.
+
+#### delete( storeItem )
+
+Delete item in this set.
+
+#### at( index )
+
+Access item with index.
+
+#### deleteAt( index )
+
+Delete item with index.
+
+#### itemMapFrom( setName )
+
+In some situation, the set is map from another set.
+
+You can use this method define `target set` which this set map from.
+
+When `target set` add item will automatic generate mapped item in this set.
+
+## TodoMVC example
+
+http://wuweijs.github.io/wuwei-todo/
