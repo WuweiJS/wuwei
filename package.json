@@ -1,6 +1,6 @@
 {
   "name": "wuwei",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "lib/Wuwei.js",
   "description": "Another Javascript Data-Driven Reactive Framwork",
   "scripts": {
