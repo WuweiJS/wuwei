@@ -310,7 +310,7 @@ In this case we can use method "setReduceMethod", assign our customized callback
 
 ### setReduceMethod( callback )
 
-StoreSet provide method "setReduceMethod", you can use it to assign callback to update value which is subscribe with other View component.
+StoreSet provide method "setReduceMethod", you can use it to assign callback to update value which subscribe with other View component.
 
 ### StoreSet Public Method
 
