@@ -1,12 +1,12 @@
 {
   "name": "wuwei",
-  "version": "0.0.1",
-  "main": "src/Wuwei.js",
+  "version": "0.0.2",
+  "main": "lib/Wuwei.js",
   "description": "Another Javascript Data-Driven Reactive Framwork",
   "scripts": {
+    "compile": "babel -d lib/ src/",
     "start": "node server.js",
-    "lint": "eslint src",
-    "play": "babel-node playground/fiddle.js"
+    "lint": "eslint src"
   },
   "repository": {
     "type": "git"
