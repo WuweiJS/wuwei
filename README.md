@@ -28,7 +28,7 @@ Wuwei provide namespace to seperate different App's store space.
 
 1. Every store as instance of Store Class which extends from ActiveStore.
 
-2. Stores maybe have other source store to construct themself.
+2. Stores maybe have other source stores to construct themself.
 
 3. You can define logic in Store Class.
 

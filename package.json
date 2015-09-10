@@ -1,7 +1,8 @@
 {
   "name": "Wuwei",
   "version": "0.0.1",
-  "description": "Another Javascript Data-Driven Reactive Framwork For ReactJS",
+  "main": "src/Wuwei.js",
+  "description": "Another Javascript Data-Driven Reactive Framwork",
   "scripts": {
     "start": "node server.js",
     "lint": "eslint src",
