@@ -1,11 +1,12 @@
 {
-  "name": "Wuwei",
-  "version": "0.0.1",
-  "description": "Another Javascript Data-Driven Reactive Framwork For ReactJS",
+  "name": "wuwei",
+  "version": "0.0.3",
+  "main": "lib/Wuwei.js",
+  "description": "Another Javascript Data-Driven Reactive Framwork",
   "scripts": {
+    "compile": "babel -d lib/ src/",
     "start": "node server.js",
-    "lint": "eslint src",
-    "play": "babel-node playground/fiddle.js"
+    "lint": "eslint src"
   },
   "repository": {
     "type": "git"
@@ -24,12 +25,9 @@
     "webpack-dev-server": "^1.8.2"
   },
   "dependencies": {
-    "director": "^1.2.8",
     "graphlib": "^1.0.7",
     "immutable": "^3.7.4",
     "react": "^0.13.0",
-    "react-router": "^0.13.3",
-    "todomvc-app-css": "^2.0.1",
-    "todomvc-common": "^1.0.2"
+    "react-router": "^0.13.3"
   }
 }
