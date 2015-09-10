@@ -1,5 +1,5 @@
 {
-  "name": "Wuwei",
+  "name": "wuwei",
   "version": "0.0.1",
   "main": "src/Wuwei.js",
   "description": "Another Javascript Data-Driven Reactive Framwork",
