@@ -5,6 +5,12 @@ Wuwei is a Data-Driven Reactive Framework.
 
 <img src="http://deltastreammedia.com/mn-epub-images/ch-newfunctions1.jpg" width="300">
 
+Wuwei is inspired from [Incremental computing](https://en.wikipedia.org/wiki/Incremental_computing)
+
+Incremental computing is a software feature which, whenever a piece of data changes, attempts to save time by only recomputing those outputs which "depend on" the changed data.
+
+So we can assume store as self-adjusting model, and each store has dependency, will organize [dependency graph](https://en.wikipedia.org/wiki/Dependency_graph) finally.
+
 # Usage
 
 ## $store, $action
@@ -19,22 +25,22 @@ var { $store, $action } = Wuwei( namespace );
 
 // @params namespace: The namespace for your App.
 ```
-Wuwei provide namespace to seperate different App's store space.
+Wuwei provide namespace to separate different App's store space.
 
 ## ActiveStore
 >君君，臣臣，父父，子子
 
 ### Principle
 
-1. Every store as instance of `Store Class` which extends from ActiveStore.
+1. Every store is an instance of `Store Class` which extends from `ActiveStore`.
 
-2. Stores maybe have other source store to construct themself.
+2. A Store maybe has other `Source store` to construct itself.
 
-3. You can define logic in `Store Class`.
+3. You can define logic about each store in your `Store Class`.
 
 <img src="http://web.cecs.pdx.edu/~sheard/course/Cs163/Graphics/graph7.png">
 
-### Example of Store Class
+### Example of a Store Class
 
 ```js
 import Wuwei from 'wuwei'
@@ -48,11 +54,11 @@ export default class Score extends ActiveStore {
 }
 ```
 
-In this case, Score has source store "counter", when counter's value changed, will trigger "onSourceUpdate" to update Score itself.
+In this case, Score (`Store Class`) has source store "counter", when counter's value changed, will trigger Score's method "onSourceUpdate" to update Score itself.
 
 ### onSourceUpdate( ...storeValues )
 
-ActiveStore provide method "onSourceUpdate", you can override it to implement how to update this store when source store changed.
+ActiveStore provide method "onSourceUpdate", you can override it to implement how to update this store when `Source store` changed.
 
 ### Create a Store
 
@@ -60,7 +66,7 @@ ActiveStore provide method "onSourceUpdate", you can override it to implement ho
 $store.create(storeName, StoreClass);
 
 /*
-@params storeName: Name of this store.
+@params storeName: Name of this store instance.
 @params StoreClass: Object Class of this store. (extends from ActiveStore)
 */
 ```
@@ -72,6 +78,8 @@ $store.create('score', Score);
 
 ### Access a Store
 
+You can access store you defined from $store directly.
+
 ```js
 // Example
 $store.score
@@ -81,7 +89,7 @@ $store.score
 
 #### source( ...storeNames )
 
-Define source stores of this store.
+Define `source stores` of this store.
 
 ```js
 // Example
@@ -92,7 +100,7 @@ $store.create('score', Score).source('counter');
 
 #### getName()
 
-Access the name of this store.
+Access the name of this store. sometimes you need it to recognize different stores.
 
 ```js
 // Example
@@ -111,6 +119,7 @@ $store.score.setValue({value: 100});
 #### getValue()
 
 Access the value of this store.
+
 ```js
 // Example
 $store.score.getValue();
@@ -119,7 +128,7 @@ $store.score.getValue();
 
 #### subscribe( callback( newValue ) )
 
-You subscribe a store, when the store's value changed will trigger callback you assigned.
+You can subscribe a store's value, when the store's value changed will trigger callback you assigned.
 
 ```js
 // Example
@@ -142,8 +151,8 @@ this.state = $store.subscribe({
   'stateKey1': 'foo',
   'stateKey2': 'bar'
 }).bind(reactComponent)
-
 ```
+
 ## Basic Example
 
 This is a counter app with Wuwei.
@@ -241,6 +250,13 @@ export default class Score extends ActiveStore {
 
 Help you manipulate dynamic store collection, such as list.
 
+### Principle
+
+1. Set is a collection of stores.
+2. Those stores are same `Store Class`.
+3. Set has its own value, the value can calculate from its items (use "setReduceMethod").
+4. Set can be a set which map from another set.
+
 ### Create a Set
 
 ```js
@@ -264,7 +280,7 @@ $store.create('todoList', TodoList);
 $store.todoList
 ```
 
-### Assign Store Class for item of set.
+### Assign Store Class for item of this set.
 
 ```js
 // Example
@@ -280,13 +296,6 @@ $store.createSet('todoList', TodoList)
       .itemClass(TodoItem)
       .itemSource('selectAllFilter')
 ```
-
-### Principle
-
-1. Set is a collection of stores.
-2. Those stores are same `Store Class`.
-3. Set has its own value, the value can calculate from its items.
-4. Set can map from another set.
 
 ### Example of Set
 
@@ -306,11 +315,12 @@ export default class TodoList extends StoreSet {
   }
 }
 ```
-In this case we can use method "setReduceMethod", assign our customized callback to calculate update TodoList's value "itemSize" when items changed (Add, Delete, or someone update)
+In this case we can use method "setReduceMethod", assign our customized callback to calculate update TodoList's value "itemSize" when items changed (Add, Delete, or any item Update)
 
 ### setReduceMethod( callback )
 
-StoreSet provide method "setReduceMethod", you can use it to assign callback to update value which subscribe with other View component.
+StoreSet provide method "setReduceMethod",
+you can use it to assign callback to update value which subscribed by other View component.
 
 ### StoreSet Public Method
 
@@ -327,11 +337,11 @@ Define item's `Store Class` in this set.
 
 #### itemSource( ...storeName )
 
-Assign source store for each item.
+Assign extra `source store` for each item.
 
 #### add()
 
-return new item created in this set.
+Will return new item created in this set.
 
 #### delete( storeItem )
 
@@ -339,7 +349,7 @@ Delete item in this set.
 
 #### toArray()
 
-Trasform set to array.
+Transform set to array.
 
 #### at( index )
 
@@ -351,11 +361,13 @@ Delete item with index.
 
 #### itemMapFrom( setName )
 
-In some situation, the set is map from another set.
+In some situations, the set is a set map from another set.
 
 You can use this method define `target set` which this set map from.
 
 When `target set` add item will automatic generate mapped item in this set.
+
+And the first source parameter of mapped items will be the store they map from.
 
 ## TodoMVC example
 
