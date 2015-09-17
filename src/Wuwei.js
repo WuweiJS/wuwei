@@ -46,12 +46,11 @@ class StoreResource {
     return this[setName];
   }
 
-  createMultiSet(multiSetName, itemClass) {
+  createMultiSet(multiSetName, multiSetClass) {
     if (this[multiSetName]) { throw `Store node: ${multiSetName} is exist.` }
-    this[multiSetName] = new StoreMultiSet(this, multiSetName, itemClass);
+    this[multiSetName] = new multiSetClass(this, multiSetName);
 
     return this[multiSetName];
-
   }
 }
 

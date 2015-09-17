@@ -3,8 +3,8 @@ export default class Set extends StoreSet {
     super(...arguments);
 
     /**
-     * Use setReduceMethod to Calculate value from set when set update.
-     * this.setReduceMethod(() => { });
+     * Use addUpdateListener to Calculate value from set when set update.
+     * this.addUpdateListener(() => { });
      */
 
     // Intialize set here

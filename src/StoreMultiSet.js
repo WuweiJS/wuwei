@@ -2,66 +2,53 @@
  * StoreMultiSet
  */
 
-// TODO: Wait for refactor & redesign
+import StoreBase from './StoreBase'
+import StoreSet from './StoreSet'
+import { UPDATE, ADD_ITEM, DELETE_ITEM, ITEM_UPDATE, TEARDOWN } from './Events'
 
-import { EventEmitter }    from 'events'
-import   Immutable         from 'immutable'
+var MAP_FROM     = Symbol('MAP_FROM'),
+    ITEM_CLASS   = Symbol('ITEM_CLASS'),
+    ITEM_SOURCES = Symbol('ITEM_SOURCES'),
+    MULTISET     = Symbol('MULTISET'),
+    SET_CLASS    = Symbol('SET_CLASS'),
+    CURRENT_ID   = Symbol('CURRENT_ID');
 
-var EVENT_EMITTER  = Symbol('EVENT_EMITTER'),
-    NAME           = Symbol('NAME'),
-
-    SET_SOURCE     = Symbol('SET_SOURCE'),
-    ITEM_SOURCES   = Symbol('ITEM_SOURCES'),
-
-    MULTISET       = Symbol('MULTISET'),
-    ITEM_CLASS     = Symbol('ITEM_CLASS'),
-
-    ON_SET_CREATE  = Symbol('ON_SET_CREATE'),
-
-    CURRENT_ID     = Symbol('CURRENT_ID'),
-
-    TEARDOWN       = 'TEARDOWN',
-    ADD_ITEM       = 'ADD_ITEM';
-
-class StoreMultiSet {
-  constructor($store, setName, itemClass) {
+class StoreMultiSet extends StoreBase{
+  constructor($store, setName) {
+    super(setName);
 
     // Private variables
-    this[EVENT_EMITTER]  = new EventEmitter();
-    this[NAME]           = setName;
-
-    this[SET_SOURCE]     = null;
-    this[ITEM_SOURCES]   = [];
-
-    this[MULTISET]       = new Set();;
-    this[ITEM_CLASS]     = itemClass;
-
-    this[ON_SET_CREATE]  = null;
-
-    this[CURRENT_ID]     = 0;
+    this[MAP_FROM] = null;
+    this[ITEM_CLASS] = null;
+    this[ITEM_SOURCES] = [];
+    this[MULTISET] = new Set();
+    this[SET_CLASS] = StoreSet; // Default setClass
+    this[CURRENT_ID] = 0;
 
     // Public variables
-    this.$store          = $store;
-    this.type            = 'MultiSet';
-
+    this.$store = $store;
+    this.type = 'MultiSet';
   }
 
-  getEventEmitter() {
-    return this[EVENT_EMITTER];
-  }
-
-  setBelongsTo(setName) {
-    this[SET_SOURCE] = this.$store[setName];
-    this[SET_SOURCE].getEventEmitter()
+  setMapFrom(setName) {
+    this[MAP_FROM] = this.$store[setName];
+    this[MAP_FROM].getEventEmitter()
       .on(ADD_ITEM, (sourceItem) => {
-        this.add(sourceItem);
+        this.add({ sourceItem: sourceItem });
       });
 
     return this;
   }
 
-  onSetCreate(_callback) {
-    this[ON_SET_CREATE] = _callback;
+  setClass(setClass) {
+    this[SET_CLASS] = setClass;
+    return this;
+  }
+
+  itemClass(itemClass) {
+    this[ITEM_CLASS] = itemClass;
+
+    return this;
   }
 
   itemSource() {
@@ -71,23 +58,27 @@ class StoreMultiSet {
     return this;
   }
 
-  add(sourceItem) {
+  add(option) {
     let itemClass = this[ITEM_CLASS],
-        setName   = `${this[NAME]}_${this.generateId()}`,
-        set       = this.$store
-                      .createSet(setName, itemClass)
-                      .itemSource(sourceItem.getName(), ...this[ITEM_SOURCES]);
+        setName = `${this.getName()}_${this.generateId()}`,
+        set = this.$store.createSet(setName, this[SET_CLASS])
+                .itemClass(itemClass)
+
 
     this[MULTISET].add(set);
 
-    sourceItem.getEventEmitter()
-      .on(TEARDOWN, () => {
-        this.delete(set);
-      });
+    if (option.sourceItem) {
+      set.itemSource(option.sourceItem.getName(), ...this[ITEM_SOURCES]);
+    } else {
+      set.itemSource(...this[ITEM_SOURCES]);
 
-    if (this[ON_SET_CREATE]) {
-      this[ON_SET_CREATE](set);
+      option.sourceItem.getEventEmitter()
+        .on(TEARDOWN, () => {
+          this.delete(set);
+        });
     }
+
+    this.setInitialize(option.sourceItem, set);
 
     return set;
   }
@@ -104,12 +95,21 @@ class StoreMultiSet {
     return this[MULTISET].size;
   }
 
-  eachSize() {
-    var setSizes = []
+  toArray() {
+    var array = []
     this[MULTISET].forEach((set) => {
-      setSizes.push(set.size());
+      array.push(set);
     });
-    return setSizes;
+    return array;
+  }
+
+  getMapFrom() {
+    return this[MAP_FROM];
+  }
+
+  // User Interface
+  setInitialize(sourceItem, set) {
+    //
   }
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "wuwei",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "lib/Wuwei.js",
   "description": "Another Javascript Data-Driven Reactive Framwork",
   "scripts": {
@@ -25,9 +25,16 @@
     "webpack-dev-server": "^1.8.2"
   },
   "dependencies": {
+    "bootstrap-sass": "^3.3.5",
+    "bootstrap-sass-loader": "^1.0.9",
+    "bootstrap-webpack": "0.0.3",
+    "file-loader": "^0.8.4",
     "graphlib": "^1.0.7",
     "immutable": "^3.7.4",
+    "node-sass": "^3.3.2",
     "react": "^0.13.0",
-    "react-router": "^0.13.3"
+    "react-router": "^0.13.3",
+    "sass-loader": "^2.0.1",
+    "url-loader": "^0.5.6"
   }
 }

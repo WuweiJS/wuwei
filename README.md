@@ -254,7 +254,7 @@ Help you manipulate dynamic store collection, such as list.
 
 1. Set is a collection of stores.
 2. Those stores are same `Store Class`.
-3. Set has its own value, the value can calculate from its items (use "setReduceMethod").
+3. Set has its own value, the value can calculate from its items (use "addUpdateListener").
 4. Set can be a set which map from another set.
 
 ### Create a Set
@@ -309,17 +309,17 @@ export default class TodoList extends StoreSet {
     super(...arguments);
 
     // Total size
-    this.setReduceMethod(() => {
+    this.addUpdateListener(() => {
       this.setValue({itemSize: this.size()});
     });
   }
 }
 ```
-In this case we can use method "setReduceMethod", assign our customized callback to calculate update TodoList's value "itemSize" when items changed (Add, Delete, or any item Update)
+In this case we can use method "addUpdateListener", assign our customized callback to calculate update TodoList's value "itemSize" when items changed (Add, Delete, or any item Update)
 
-### setReduceMethod( callback )
+### addUpdateListener( callback )
 
-StoreSet provide method "setReduceMethod",
+StoreSet provide method "addUpdateListener",
 you can use it to assign callback to update value which subscribed by other View component.
 
 ### StoreSet Public Method

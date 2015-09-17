@@ -5,7 +5,7 @@
 import StoreBase from './StoreBase'
 import { UPDATE, ADD_ITEM, DELETE_ITEM, ITEM_UPDATE } from './Events'
 
-var SET_SOURCE   = Symbol('SET_SOURCE'),
+var MAP_FROM     = Symbol('MAP_FROM'),
     ITEM_CLASS   = Symbol('ITEM_CLASS'),
     ITEM_SOURCES = Symbol('ITEM_SOURCES'),
     ITEM_SET     = Symbol('ITEM_SET'),
@@ -16,7 +16,7 @@ class StoreSet extends StoreBase {
     super(setName);
 
     // Private variables
-    this[SET_SOURCE]   = null;
+    this[MAP_FROM]   = null;
     this[ITEM_CLASS]   = null;
     this[ITEM_SOURCES] = [];
     this[ITEM_SET]     = new Set();;
@@ -34,13 +34,19 @@ class StoreSet extends StoreBase {
   }
 
   itemMapFrom(setName) {
-    this[SET_SOURCE] = this.$store[setName];
-    this[SET_SOURCE].getEventEmitter()
+    this[MAP_FROM] = this.$store[setName];
+    this[MAP_FROM].getEventEmitter()
       .on(ADD_ITEM, (sourceItem) => {
-        this.add(sourceItem);
+        this.add({
+          sourceItem: sourceItem
+        });
       });
 
     return this;
+  }
+
+  getMapFrom() {
+    return this[MAP_FROM];
   }
 
   itemSource() {
@@ -54,15 +60,19 @@ class StoreSet extends StoreBase {
     this.getEventEmitter().emit(ITEM_UPDATE);
   }
 
-  add(sourceItem = null) {
+  add(option) {
     let itemClass = this[ITEM_CLASS],
         itemName  = `${this.getName()}_${this.generateId()}`,
         item      = this.$store.create(itemName, itemClass, this);
 
-    if (sourceItem) {
-      item.source(...[sourceItem.getName(), ...this[ITEM_SOURCES]]);
+    if (option.sourceItem) {
+      item.source(...[option.sourceItem.getName(), ...this[ITEM_SOURCES]]);
     } else {
       item.source(...this[ITEM_SOURCES]);
+    }
+
+    if (option.defalutValue) {
+      item.setValue(option.defalutValue);
     }
 
     item.subscribe(() => {
@@ -93,6 +103,15 @@ class StoreSet extends StoreBase {
     return array;
   }
 
+  filter(_test) {
+    toArray().filter(_test)
+
+  }
+
+  sort(_test) {
+    this.toArray().filter(_test)
+  }
+
   at(index) {
     return this.toArray()[index];
   }
@@ -105,8 +124,16 @@ class StoreSet extends StoreBase {
     return this[CURRENT_ID]++;
   }
 
+  getMapFrom() {
+    return this[MAP_FROM];
+  }
+
+  getItemSource() {
+    return this[ITEM_SOURCES];
+  }
+
   // User Interface
-  setReduceMethod(_callback) {
+  addUpdateListener(_callback) {
     this.getEventEmitter().on(ADD_ITEM, _callback.bind(this));
     this.getEventEmitter().on(DELETE_ITEM, _callback.bind(this));
     this.getEventEmitter().on(ITEM_UPDATE, _callback.bind(this));
